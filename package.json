@@ -1,0 +1,15 @@
+{
+	"name": "site-color-schemes",
+	"description": "Plugin of determining and switching the color theme of the site",
+	"version": "1.0.0",
+	"homepage": "https://github.com/GreyAdmiral/site-color-schemes",
+	"repository": "git://github.com/GreyAdmiral/site-color-schemes.git",
+	"author": "Binarion (https://greyadmiral.github.io/)",
+	"main": "./index.js",
+	"keywords": [
+		"plugin",
+		"color-schemes",
+		"site-color-schemes"
+	],
+	"license": "MIT"
+}
