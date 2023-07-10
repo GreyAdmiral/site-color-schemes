@@ -1,6 +1,6 @@
 # site-color-schemes
 
-> This is a plugin of determining and switching the color theme of the site.
+> This is a plugin of determining and switching the color theme of the site. Adds a class to stylizing a dark or bright site of the site to the HTML element.
 
 ## Install
 
@@ -57,8 +57,13 @@ or
 ```javascript
 const colorSchemes = require("site-color-schemes");
 
-colorSchemes.click(); // You can also for example: colorSchemes.click({selector: ".class"});
+colorSchemes.click(); // You can also for example: colorSchemes.click({selector: ".class", lightClass: "myLighyClass"});
 ```
+
+## Methods
+
+   - «auto» — The class class is added activated on the user device (light or dark)
+   - «click» — Until the user has used the topic change button, the topic class is added activated on the user device (light or dark).After clicking on the change button of the topic, the choice of the invoice is remembered and at the next opening the site the class selected by the topic selected by the user (light or dark) is added
 
 ## Note
 
@@ -67,5 +72,17 @@ When using a plugin without options, the color switch button for the HTML should
 #### Example:
 
 ```html
-<button data-color-scheme><img src="/path-to-the-icon">Perhaps the text of the button</button>
+<button data-color-scheme>
+   <img src="/path-to-the-icon">
+   Perhaps the text of the button
+</button>
+```
+
+## Sample result
+
+```html
+<!DOCTYPE html>
+<html class="light"> <!-- The result of the work of the plugin -->
+...
+</html>
 ```
