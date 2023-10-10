@@ -14,7 +14,7 @@ module.exports = function (options) {
 	}
 	let scheme = darkMedia.matches ? windowsPrototype.colorSchemeOptions.darkClass : windowsPrototype.colorSchemeOptions.lightClass;
 	document.documentElement.classList.add(scheme);
-	darkMedia.addListener(changeScheme);
+	darkMedia.onchange = changeScheme;
 	changeScheme(darkMedia);
 }
 function changeScheme(e) {
