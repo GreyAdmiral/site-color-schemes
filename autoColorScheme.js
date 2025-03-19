@@ -1,26 +1,28 @@
 // @ts-check
-const windowsPrototype = Object.getPrototypeOf(window);
-module.exports = function (options) {
-	const opt = {
-		lightClass: "light",
-		darkClass:  "dark",
-	},
-	darkMedia = window.matchMedia("(prefers-color-scheme: dark)");
-	Object.assign(opt, options);
-	if (!windowsPrototype.colorSchemeOptions) {
-		windowsPrototype.colorSchemeOptions = opt;
-	} else if (JSON.stringify(windowsPrototype.colorSchemeOptions) == JSON.stringify(opt)) {
-		windowsPrototype.colorSchemeOptions = opt;
-	}
-	let scheme = darkMedia.matches ? windowsPrototype.colorSchemeOptions.darkClass : windowsPrototype.colorSchemeOptions.lightClass;
-	document.documentElement.classList.add(scheme);
-	darkMedia.onchange = changeScheme;
-	changeScheme(darkMedia);
+const prototype = autoColorScheme.prototype;
+function autoColorScheme(options) {
+   const opt = {
+         lightClass: "light",
+         darkClass: "dark",
+      },
+      darkMedia = window.matchMedia("(prefers-color-scheme: dark)");
+   Object.assign(opt, options);
+   if (!prototype.colorSchemeOptions) {
+      prototype.colorSchemeOptions = opt;
+   } else if (JSON.stringify(prototype.colorSchemeOptions) == JSON.stringify(opt)) {
+      prototype.colorSchemeOptions = opt;
+   }
+   let scheme = darkMedia.matches ? prototype.colorSchemeOptions.darkClass : prototype.colorSchemeOptions.lightClass;
+   document.documentElement.classList.add(scheme);
+   darkMedia.onchange = changeScheme;
+   changeScheme(darkMedia);
 }
 function changeScheme(e) {
-	if (e.matches) {
-		document.documentElement.classList.replace(windowsPrototype.colorSchemeOptions.lightClass, windowsPrototype.colorSchemeOptions.darkClass);
-	} else {
-		document.documentElement.classList.replace(windowsPrototype.colorSchemeOptions.darkClass, windowsPrototype.colorSchemeOptions.lightClass);
-	}
+   if (e.matches) {
+      document.documentElement.classList.replace(prototype.colorSchemeOptions.lightClass, prototype.colorSchemeOptions.darkClass);
+   } else {
+      document.documentElement.classList.replace(prototype.colorSchemeOptions.darkClass, prototype.colorSchemeOptions.lightClass);
+   }
 }
+
+module.exports = autoColorScheme;
