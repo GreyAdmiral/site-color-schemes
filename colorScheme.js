@@ -6,14 +6,15 @@ function colorScheme(options) {
       selector: "[data-color-scheme]",
       lightClass: "light",
       darkClass: "dark",
+      mode: "class",
    };
    try {
       Object.assign(opt, options);
-      document.addEventListener("DOMContentLoaded", colorSchemeLoad);
       const button = document.querySelector(opt.selector);
       if (button) {
          prototype.colorSchemeButton = button;
          prototype.colorSchemeOptions = opt;
+         document.addEventListener("DOMContentLoaded", colorSchemeLoad);
       } else {
          throw new Error(`Селектор ${opt.selector} не существует!`);
       }
@@ -24,15 +25,23 @@ function colorScheme(options) {
 function colorSchemeLoad() {
    const saveScheme = localStorage.getItem("userScheme");
    if (!saveScheme) {
-      autoColorScheme();
+      autoColorScheme(prototype.colorSchemeOptions);
    } else {
-      document.documentElement.classList.add(saveScheme);
+      if (prototype.colorSchemeOptions.mode === "attribute") {
+         document.documentElement.setAttribute("data-theme", saveScheme);
+      } else {
+         document.documentElement.classList.add(saveScheme);
+      }
    }
    if (prototype.colorSchemeButton) {
-      prototype.colorSchemeButton.onclick = clickChangeScheme;
+      if (prototype.colorSchemeOptions.mode === "attribute") {
+         prototype.colorSchemeButton.onclick = clickChangeAttributeScheme;
+      } else {
+         prototype.colorSchemeButton.onclick = clickChangeClassScheme;
+      }
    }
 }
-function clickChangeScheme() {
+function clickChangeClassScheme() {
    let currentScheme = document.documentElement.classList.contains(prototype.colorSchemeOptions.lightClass)
       ? prototype.colorSchemeOptions.lightClass
       : prototype.colorSchemeOptions.darkClass;
@@ -43,6 +52,18 @@ function clickChangeScheme() {
       newScheme = prototype.colorSchemeOptions.lightClass;
    }
    document.documentElement.classList.replace(currentScheme, newScheme);
+   localStorage.setItem("userScheme", newScheme);
+}
+function clickChangeAttributeScheme() {
+   const isLight = document.documentElement.getAttribute("data-theme") === prototype.colorSchemeOptions.lightClass;
+   const currentScheme = isLight ? prototype.colorSchemeOptions.lightClass : prototype.colorSchemeOptions.darkClass;
+   let newScheme = "";
+   if (currentScheme == prototype.colorSchemeOptions.lightClass) {
+      newScheme = prototype.colorSchemeOptions.darkClass;
+   } else if (currentScheme == prototype.colorSchemeOptions.darkClass) {
+      newScheme = prototype.colorSchemeOptions.lightClass;
+   }
+   document.documentElement.setAttribute("data-theme", newScheme);
    localStorage.setItem("userScheme", newScheme);
 }
 module.exports = colorScheme;
