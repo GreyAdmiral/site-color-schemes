@@ -1,15 +1,26 @@
 {
-	"name": "site-color-schemes",
-	"description": "Plugin of determining and switching the color theme of the site",
-	"version": "1.2.0",
-	"homepage": "https://github.com/GreyAdmiral",
-	"repository": "git://github.com/GreyAdmiral/site-color-schemes.git",
-	"author": "Binarion (https://greyadmiral.github.io/)",
-	"main": "./index.js",
-	"keywords": [
-		"plugin",
-		"color-schemes",
-		"site-color-schemes"
-	],
-	"license": "MIT"
+   "name": "site-color-schemes",
+   "description": "Plugin of determining and switching the color theme of the site",
+   "version": "2.0.0",
+   "homepage": "https://github.com/GreyAdmiral",
+   "repository": "git://github.com/GreyAdmiral/site-color-schemes.git",
+   "author": "Binarion (https://greyadmiral.github.io/)",
+   "main": "dist/index.js",
+   "keywords": [
+      "plugin",
+      "color-schemes",
+      "site-color-schemes"
+   ],
+   "license": "MIT",
+   "scripts": {
+      "build": "rollup -c"
+   },
+   "devDependencies": {
+      "@babel/preset-env": "^7.29.5",
+      "@rollup/plugin-babel": "^7.0.0",
+      "@rollup/plugin-commonjs": "^29.0.2",
+      "@rollup/plugin-json": "^6.1.0",
+      "@rollup/plugin-terser": "^1.0.0",
+      "rollup": "^4.60.4"
+   }
 }
