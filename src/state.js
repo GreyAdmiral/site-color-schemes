@@ -3,20 +3,24 @@
 /**
  * @typedef {object} defaultOptions
  * @prop {string} selector='[data-color-scheme]'
+ * @prop {string} resetSelector='[data-scheme-reset]'
  * @prop {string} lightClass
  * @prop {string} darkClass
- * @prop {string} mode
+ * @prop {'class' | 'attribute'} mode
  */
 
 /**
  * @typedef {object} STATE
  * @prop {defaultOptions} colorSchemeOptions
  * @prop {HTMLElement | null} [colorSchemeButton]
+ * @prop {HTMLElement | null} [resetSchemeButton]
+ * @prop {string} storageTitle
  */
 
 /** @type {defaultOptions} */
 const DEFAULT_OPTIONS = {
    selector: '[data-color-scheme]',
+   resetSelector: '[data-scheme-reset]',
    lightClass: 'light',
    darkClass: 'dark',
    mode: 'class',
@@ -25,7 +29,9 @@ const DEFAULT_OPTIONS = {
 /** @type {STATE} */
 export const STATE = {
    colorSchemeOptions: { ...DEFAULT_OPTIONS },
+   storageTitle: 'userScheme',
    colorSchemeButton: null,
+   resetSchemeButton: null,
 };
 
 /**

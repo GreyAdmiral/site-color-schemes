@@ -1,43 +1,37 @@
 // @ts-check
 import autoColorScheme from './autoColorScheme.js';
 import { STATE, setOptions } from './state.js';
-import { clickChangeClassScheme, clickChangeAttributeScheme } from './events.js';
+import { clickChangeClassScheme, clickChangeAttributeScheme, cbInitial } from './events.js';
+import { clickResetScheme } from './resetScheme.js';
 
 /**
  * @param {Object} [options]
  * @param {string} [options.selector='[data-color-scheme]']
  * @param {string} [options.lightClass]
  * @param {string} [options.darkClass]
- * @param {string} [options.mode]
+ * @param {'class' | 'attribute'} [options.mode]
  */
 export default function colorScheme(options) {
    if (options) setOptions(options);
 
-   try {
-      /**
-       * @type {HTMLElement | null}
-       */
-      const button = document.querySelector(STATE.colorSchemeOptions.selector);
+   /** @type {HTMLElement | null} */
+   const button = document.querySelector(STATE.colorSchemeOptions.selector);
+   /** @type {HTMLElement | null} */
+   const resetButton = document.querySelector(STATE.colorSchemeOptions.resetSelector);
 
-      if (button) {
-         STATE.colorSchemeButton = button;
-
-         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', colorSchemeLoad, { once: true });
-         } else {
-            colorSchemeLoad();
-         }
-      } else {
-         throw new Error(`Элемент по селектору ${STATE.colorSchemeOptions.selector} не найден!`);
-      }
-   } catch (err) {
-      autoColorScheme();
-      console.error(err);
+   if (!button) {
+      console.error(`Элемент по селектору ${STATE.colorSchemeOptions.selector} не найден!`);
+      cbInitial(autoColorScheme);
+      return;
    }
+
+   STATE.colorSchemeButton = button;
+   STATE.resetSchemeButton = resetButton;
+   cbInitial(colorSchemeLoad);
 }
 
 function colorSchemeLoad() {
-   const saveScheme = localStorage.getItem('userScheme');
+   const saveScheme = localStorage.getItem(STATE.storageTitle);
 
    if (!saveScheme) {
       autoColorScheme();
@@ -55,5 +49,9 @@ function colorSchemeLoad() {
       } else {
          STATE.colorSchemeButton.onclick = clickChangeClassScheme;
       }
+   }
+
+   if (STATE.resetSchemeButton) {
+      STATE.resetSchemeButton.onclick = clickResetScheme;
    }
 }

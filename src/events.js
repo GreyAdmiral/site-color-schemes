@@ -35,7 +35,7 @@ export function clickChangeClassScheme() {
    }
 
    document.documentElement.classList.replace(currentScheme, newScheme);
-   localStorage.setItem('userScheme', newScheme);
+   localStorage.setItem(STATE.storageTitle, newScheme);
 }
 
 export function clickChangeAttributeScheme() {
@@ -50,5 +50,16 @@ export function clickChangeAttributeScheme() {
    }
 
    document.documentElement.setAttribute('data-theme', newScheme);
-   localStorage.setItem('userScheme', newScheme);
+   localStorage.setItem(STATE.storageTitle, newScheme);
+}
+
+/**
+ * @param {Function} cb
+ */
+export function cbInitial(cb) {
+   if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => cb(), { once: true });
+   } else {
+      cb();
+   }
 }

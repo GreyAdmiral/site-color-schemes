@@ -6,7 +6,7 @@ import { STATE, setOptions } from './state.js';
  * @param {Object} [options]
  * @param {string} [options.lightClass]
  * @param {string} [options.darkClass]
- * @param {string} [options.mode]
+ * @param {'class' | 'attribute'} [options.mode]
  */
 export default function autoColorScheme(options) {
    if (options) setOptions(options);

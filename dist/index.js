@@ -5,20 +5,24 @@
 /**
  * @typedef {object} defaultOptions
  * @prop {string} selector='[data-color-scheme]'
+ * @prop {string} resetSelector='[data-scheme-reset]'
  * @prop {string} lightClass
  * @prop {string} darkClass
- * @prop {string} mode
+ * @prop {'class' | 'attribute'} mode
  */
 
 /**
  * @typedef {object} STATE
  * @prop {defaultOptions} colorSchemeOptions
  * @prop {HTMLElement | null} [colorSchemeButton]
+ * @prop {HTMLElement | null} [resetSchemeButton]
+ * @prop {string} storageTitle
  */
 
 /** @type {defaultOptions} */
 const DEFAULT_OPTIONS = {
    selector: '[data-color-scheme]',
+   resetSelector: '[data-scheme-reset]',
    lightClass: 'light',
    darkClass: 'dark',
    mode: 'class',
@@ -27,7 +31,9 @@ const DEFAULT_OPTIONS = {
 /** @type {STATE} */
 const STATE = {
    colorSchemeOptions: { ...DEFAULT_OPTIONS },
+   storageTitle: 'userScheme',
    colorSchemeButton: null,
+   resetSchemeButton: null,
 };
 
 /**
@@ -77,7 +83,7 @@ function clickChangeClassScheme() {
    }
 
    document.documentElement.classList.replace(currentScheme, newScheme);
-   localStorage.setItem('userScheme', newScheme);
+   localStorage.setItem(STATE.storageTitle, newScheme);
 }
 
 function clickChangeAttributeScheme() {
@@ -92,7 +98,18 @@ function clickChangeAttributeScheme() {
    }
 
    document.documentElement.setAttribute('data-theme', newScheme);
-   localStorage.setItem('userScheme', newScheme);
+   localStorage.setItem(STATE.storageTitle, newScheme);
+}
+
+/**
+ * @param {Function} cb
+ */
+function cbInitial(cb) {
+   if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => cb(), { once: true });
+   } else {
+      cb();
+   }
 }
 
 // @ts-check
@@ -120,6 +137,11 @@ function autoColorScheme(options) {
    }
 }
 
+function clickResetScheme() {
+   localStorage.removeItem(STATE.storageTitle);
+   autoColorScheme();
+}
+
 // @ts-check
 
 /**
@@ -127,36 +149,29 @@ function autoColorScheme(options) {
  * @param {string} [options.selector='[data-color-scheme]']
  * @param {string} [options.lightClass]
  * @param {string} [options.darkClass]
- * @param {string} [options.mode]
+ * @param {'class' | 'attribute'} [options.mode]
  */
 function colorScheme(options) {
    if (options) setOptions(options);
 
-   try {
-      /**
-       * @type {HTMLElement | null}
-       */
-      const button = document.querySelector(STATE.colorSchemeOptions.selector);
+   /** @type {HTMLElement | null} */
+   const button = document.querySelector(STATE.colorSchemeOptions.selector);
+   /** @type {HTMLElement | null} */
+   const resetButton = document.querySelector(STATE.colorSchemeOptions.resetSelector);
 
-      if (button) {
-         STATE.colorSchemeButton = button;
-
-         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', colorSchemeLoad, { once: true });
-         } else {
-            colorSchemeLoad();
-         }
-      } else {
-         throw new Error(`Элемент по селектору ${STATE.colorSchemeOptions.selector} не найден!`);
-      }
-   } catch (err) {
-      autoColorScheme();
-      console.error(err);
+   if (!button) {
+      console.error(`Элемент по селектору ${STATE.colorSchemeOptions.selector} не найден!`);
+      cbInitial(autoColorScheme);
+      return;
    }
+
+   STATE.colorSchemeButton = button;
+   STATE.resetSchemeButton = resetButton;
+   cbInitial(colorSchemeLoad);
 }
 
 function colorSchemeLoad() {
-   const saveScheme = localStorage.getItem('userScheme');
+   const saveScheme = localStorage.getItem(STATE.storageTitle);
 
    if (!saveScheme) {
       autoColorScheme();
@@ -174,6 +189,10 @@ function colorSchemeLoad() {
       } else {
          STATE.colorSchemeButton.onclick = clickChangeClassScheme;
       }
+   }
+
+   if (STATE.resetSchemeButton) {
+      STATE.resetSchemeButton.onclick = clickResetScheme;
    }
 }
 
