@@ -9,6 +9,7 @@
  * @prop {string} lightClass
  * @prop {string} darkClass
  * @prop {'class' | 'attribute'} mode
+ * @prop {'local' | 'cookies'} storage
  */
 
 /**
@@ -25,6 +26,7 @@ const DEFAULT_OPTIONS = {
    resetSelector: '[data-scheme-reset]',
    lightClass: 'light',
    darkClass: 'dark',
+   storage: 'local',
    mode: 'class',
 };
 
@@ -45,6 +47,49 @@ function setOptions(options) {
    } else {
       STATE.colorSchemeOptions = { ...DEFAULT_OPTIONS };
    }
+}
+
+const LIFE_YEARS = 1;
+
+function getMaxAge(year = 1) {
+   const date = new Date();
+
+   date.setFullYear(date.getFullYear() + year);
+   return date.toUTCString();
+}
+
+function getCookie(name) {
+   let matches = document.cookie.match(new RegExp('(?:^|; )' + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + '=([^;]*)'));
+   return matches ? decodeURIComponent(matches[1]) : undefined;
+}
+
+function setCookie(name, value) {
+   const options = {
+      expires: getMaxAge(LIFE_YEARS),
+      path: '/',
+      domain: '',
+      samesite: 'Lax',
+   };
+
+   if (options.expires instanceof Date) options.expires = options.expires.toUTCString();
+
+   let updatedCookie = encodeURIComponent(name) + '=' + encodeURIComponent(value);
+
+   for (let optionKey in options) {
+      updatedCookie += '; ' + optionKey;
+
+      let optionValue = options[optionKey];
+
+      if (optionValue !== true) {
+         updatedCookie += '=' + optionValue;
+      }
+   }
+
+   document.cookie = updatedCookie;
+}
+
+function deleteCookie(name) {
+   setCookie(name, '');
 }
 
 //@ts-check
@@ -72,6 +117,7 @@ function changeAttributeScheme(e) {
 }
 
 function clickChangeClassScheme() {
+   const isCookiesStorage = STATE.colorSchemeOptions.storage === 'cookies';
    const isLight = document.documentElement.classList.contains(STATE.colorSchemeOptions.lightClass);
    const currentScheme = isLight ? STATE.colorSchemeOptions.lightClass : STATE.colorSchemeOptions.darkClass;
    let newScheme = '';
@@ -83,10 +129,16 @@ function clickChangeClassScheme() {
    }
 
    document.documentElement.classList.replace(currentScheme, newScheme);
-   localStorage.setItem(STATE.storageTitle, newScheme);
+
+   if (isCookiesStorage) {
+      setCookie(STATE.storageTitle, newScheme);
+   } else {
+      localStorage.setItem(STATE.storageTitle, newScheme);
+   }
 }
 
 function clickChangeAttributeScheme() {
+   const isCookiesStorage = STATE.colorSchemeOptions.storage === 'cookies';
    const isLight = document.documentElement.getAttribute('data-theme') === STATE.colorSchemeOptions.lightClass;
    const currentScheme = isLight ? STATE.colorSchemeOptions.lightClass : STATE.colorSchemeOptions.darkClass;
    let newScheme = '';
@@ -98,7 +150,12 @@ function clickChangeAttributeScheme() {
    }
 
    document.documentElement.setAttribute('data-theme', newScheme);
-   localStorage.setItem(STATE.storageTitle, newScheme);
+
+   if (isCookiesStorage) {
+      setCookie(STATE.storageTitle, newScheme);
+   } else {
+      localStorage.setItem(STATE.storageTitle, newScheme);
+   }
 }
 
 /**
@@ -118,7 +175,7 @@ function cbInitial(cb) {
  * @param {Object} [options]
  * @param {string} [options.lightClass]
  * @param {string} [options.darkClass]
- * @param {string} [options.mode]
+ * @param {'class' | 'attribute'} [options.mode]
  */
 function autoColorScheme(options) {
    if (options) setOptions(options);
@@ -138,7 +195,14 @@ function autoColorScheme(options) {
 }
 
 function clickResetScheme() {
-   localStorage.removeItem(STATE.storageTitle);
+   const isCookiesStorage = STATE.colorSchemeOptions.storage === 'cookies';
+
+   if (isCookiesStorage) {
+      deleteCookie(STATE.storageTitle);
+   } else {
+      localStorage.removeItem(STATE.storageTitle);
+   }
+
    autoColorScheme();
 }
 
@@ -147,9 +211,11 @@ function clickResetScheme() {
 /**
  * @param {Object} [options]
  * @param {string} [options.selector='[data-color-scheme]']
+ * @param {string} [options.resetSelector='[data-scheme-reset]']
  * @param {string} [options.lightClass]
  * @param {string} [options.darkClass]
  * @param {'class' | 'attribute'} [options.mode]
+ * @param {'local' | 'cookies'} [options.storage]
  */
 function colorScheme(options) {
    if (options) setOptions(options);
@@ -171,7 +237,14 @@ function colorScheme(options) {
 }
 
 function colorSchemeLoad() {
-   const saveScheme = localStorage.getItem(STATE.storageTitle);
+   const isCookiesStorage = STATE.colorSchemeOptions.storage === 'cookies';
+   let saveScheme;
+
+   if (isCookiesStorage) {
+      saveScheme = getCookie(STATE.storageTitle);
+   } else {
+      saveScheme = localStorage.getItem(STATE.storageTitle);
+   }
 
    if (!saveScheme) {
       autoColorScheme();

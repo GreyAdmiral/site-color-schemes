@@ -2,14 +2,17 @@
 import autoColorScheme from './autoColorScheme.js';
 import { STATE, setOptions } from './state.js';
 import { clickChangeClassScheme, clickChangeAttributeScheme, cbInitial } from './events.js';
+import { getCookie } from './cookies.js';
 import { clickResetScheme } from './resetScheme.js';
 
 /**
  * @param {Object} [options]
  * @param {string} [options.selector='[data-color-scheme]']
+ * @param {string} [options.resetSelector='[data-scheme-reset]']
  * @param {string} [options.lightClass]
  * @param {string} [options.darkClass]
  * @param {'class' | 'attribute'} [options.mode]
+ * @param {'local' | 'cookies'} [options.storage]
  */
 export default function colorScheme(options) {
    if (options) setOptions(options);
@@ -31,7 +34,14 @@ export default function colorScheme(options) {
 }
 
 function colorSchemeLoad() {
-   const saveScheme = localStorage.getItem(STATE.storageTitle);
+   const isCookiesStorage = STATE.colorSchemeOptions.storage === 'cookies';
+   let saveScheme;
+
+   if (isCookiesStorage) {
+      saveScheme = getCookie(STATE.storageTitle);
+   } else {
+      saveScheme = localStorage.getItem(STATE.storageTitle);
+   }
 
    if (!saveScheme) {
       autoColorScheme();

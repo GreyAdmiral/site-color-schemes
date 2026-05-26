@@ -7,6 +7,7 @@
  * @prop {string} lightClass
  * @prop {string} darkClass
  * @prop {'class' | 'attribute'} mode
+ * @prop {'local' | 'cookies'} storage
  */
 
 /**
@@ -23,6 +24,7 @@ const DEFAULT_OPTIONS = {
    resetSelector: '[data-scheme-reset]',
    lightClass: 'light',
    darkClass: 'dark',
+   storage: 'local',
    mode: 'class',
 };
 

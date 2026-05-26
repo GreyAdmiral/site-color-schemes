@@ -1,5 +1,6 @@
 //@ts-check
 import { STATE } from './state.js';
+import { setCookie } from './cookies.js';
 
 /**
  * @param {MediaQueryListEventInit} e
@@ -24,6 +25,7 @@ export function changeAttributeScheme(e) {
 }
 
 export function clickChangeClassScheme() {
+   const isCookiesStorage = STATE.colorSchemeOptions.storage === 'cookies';
    const isLight = document.documentElement.classList.contains(STATE.colorSchemeOptions.lightClass);
    const currentScheme = isLight ? STATE.colorSchemeOptions.lightClass : STATE.colorSchemeOptions.darkClass;
    let newScheme = '';
@@ -35,10 +37,16 @@ export function clickChangeClassScheme() {
    }
 
    document.documentElement.classList.replace(currentScheme, newScheme);
-   localStorage.setItem(STATE.storageTitle, newScheme);
+
+   if (isCookiesStorage) {
+      setCookie(STATE.storageTitle, newScheme);
+   } else {
+      localStorage.setItem(STATE.storageTitle, newScheme);
+   }
 }
 
 export function clickChangeAttributeScheme() {
+   const isCookiesStorage = STATE.colorSchemeOptions.storage === 'cookies';
    const isLight = document.documentElement.getAttribute('data-theme') === STATE.colorSchemeOptions.lightClass;
    const currentScheme = isLight ? STATE.colorSchemeOptions.lightClass : STATE.colorSchemeOptions.darkClass;
    let newScheme = '';
@@ -50,7 +58,12 @@ export function clickChangeAttributeScheme() {
    }
 
    document.documentElement.setAttribute('data-theme', newScheme);
-   localStorage.setItem(STATE.storageTitle, newScheme);
+
+   if (isCookiesStorage) {
+      setCookie(STATE.storageTitle, newScheme);
+   } else {
+      localStorage.setItem(STATE.storageTitle, newScheme);
+   }
 }
 
 /**
