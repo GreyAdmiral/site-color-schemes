@@ -96,10 +96,13 @@ function deleteCookie(name) {
  * @param {MediaQueryListEventInit} e
  */
 function changeClassScheme(e) {
+   const { lightClass, darkClass } = STATE.colorSchemeOptions;
+   const classList = document.documentElement.classList;
+
    if (e.matches) {
-      document.documentElement.classList.replace(STATE.colorSchemeOptions.lightClass, STATE.colorSchemeOptions.darkClass);
+      classList.replace(lightClass, darkClass);
    } else {
-      document.documentElement.classList.replace(STATE.colorSchemeOptions.darkClass, STATE.colorSchemeOptions.lightClass);
+      classList.replace(darkClass, lightClass);
    }
 }
 
@@ -107,26 +110,31 @@ function changeClassScheme(e) {
  * @param {MediaQueryListEventInit} e
  */
 function changeAttributeScheme(e) {
+   const { lightClass, darkClass } = STATE.colorSchemeOptions;
+   const root = document.documentElement;
+
    if (e.matches) {
-      document.documentElement.setAttribute('data-theme', STATE.colorSchemeOptions.darkClass);
+      root.setAttribute('data-theme', darkClass);
    } else {
-      document.documentElement.setAttribute('data-theme', STATE.colorSchemeOptions.lightClass);
+      root.setAttribute('data-theme', lightClass);
    }
 }
 
 function clickChangeClassScheme() {
-   const isCookiesStorage = STATE.colorSchemeOptions.storage === 'cookies';
-   const isLight = document.documentElement.classList.contains(STATE.colorSchemeOptions.lightClass);
-   const currentScheme = isLight ? STATE.colorSchemeOptions.lightClass : STATE.colorSchemeOptions.darkClass;
+   const { lightClass, darkClass, storage } = STATE.colorSchemeOptions;
+   const isCookiesStorage = storage === 'cookies';
+   const classList = document.documentElement.classList;
+   const isLight = classList.contains(lightClass);
+   const currentScheme = isLight ? lightClass : darkClass;
    let newScheme = '';
 
-   if (currentScheme == STATE.colorSchemeOptions.lightClass) {
-      newScheme = STATE.colorSchemeOptions.darkClass;
-   } else if (currentScheme == STATE.colorSchemeOptions.darkClass) {
-      newScheme = STATE.colorSchemeOptions.lightClass;
+   if (currentScheme == lightClass) {
+      newScheme = darkClass;
+   } else if (currentScheme == darkClass) {
+      newScheme = lightClass;
    }
 
-   document.documentElement.classList.replace(currentScheme, newScheme);
+   classList.replace(currentScheme, newScheme);
 
    if (isCookiesStorage) {
       setCookie(STATE.storageTitle, newScheme);
@@ -136,18 +144,20 @@ function clickChangeClassScheme() {
 }
 
 function clickChangeAttributeScheme() {
-   const isCookiesStorage = STATE.colorSchemeOptions.storage === 'cookies';
-   const isLight = document.documentElement.getAttribute('data-theme') === STATE.colorSchemeOptions.lightClass;
-   const currentScheme = isLight ? STATE.colorSchemeOptions.lightClass : STATE.colorSchemeOptions.darkClass;
+   const { lightClass, darkClass, storage } = STATE.colorSchemeOptions;
+   const isCookiesStorage = storage === 'cookies';
+   const root = document.documentElement;
+   const isLight = root.getAttribute('data-theme') === lightClass;
+   const currentScheme = isLight ? lightClass : darkClass;
    let newScheme = '';
 
-   if (currentScheme == STATE.colorSchemeOptions.lightClass) {
-      newScheme = STATE.colorSchemeOptions.darkClass;
-   } else if (currentScheme == STATE.colorSchemeOptions.darkClass) {
-      newScheme = STATE.colorSchemeOptions.lightClass;
+   if (currentScheme == lightClass) {
+      newScheme = darkClass;
+   } else if (currentScheme == darkClass) {
+      newScheme = lightClass;
    }
 
-   document.documentElement.setAttribute('data-theme', newScheme);
+   root.setAttribute('data-theme', newScheme);
 
    if (isCookiesStorage) {
       setCookie(STATE.storageTitle, newScheme);
@@ -178,30 +188,32 @@ function cbInitial(cb) {
 function autoColorScheme(options) {
    if (options) setOptions(options);
 
+   const root = document.documentElement;
+   const { lightClass, darkClass, mode } = STATE.colorSchemeOptions;
    const darkMedia = window.matchMedia('(prefers-color-scheme: dark)');
-   const scheme = darkMedia.matches ? STATE.colorSchemeOptions.darkClass : STATE.colorSchemeOptions.lightClass;
+   const scheme = darkMedia.matches ? darkClass : lightClass;
+   const handler = mode === 'attribute' ? changeAttributeScheme : changeClassScheme;
 
-   if (STATE.colorSchemeOptions.mode === 'attribute') {
-      document.documentElement.setAttribute('data-theme', scheme);
-      darkMedia.onchange = changeAttributeScheme;
-      changeAttributeScheme(darkMedia);
+   if (mode === 'attribute') {
+      root.setAttribute('data-theme', scheme);
    } else {
-      const isHasLight = document.documentElement.classList.contains(STATE.colorSchemeOptions.lightClass);
-      const isHasDark = document.documentElement.classList.contains(STATE.colorSchemeOptions.darkClass);
+      const classList = root.classList;
+      const isHasLight = classList.contains(lightClass);
+      const isHasDark = classList.contains(darkClass);
 
       if (!isHasLight && !isHasDark) {
-         document.documentElement.classList.add(scheme);
+         classList.add(scheme);
       } else if (isHasLight && isHasDark) {
-         const extraScheme = darkMedia.matches ? STATE.colorSchemeOptions.lightClass : STATE.colorSchemeOptions.darkClass;
-         document.documentElement.classList.remove(extraScheme);
+         const extraScheme = darkMedia.matches ? lightClass : darkClass;
+         classList.remove(extraScheme);
       } else {
-         if (isHasLight) document.documentElement.classList.replace(STATE.colorSchemeOptions.lightClass, scheme);
-         if (isHasDark) document.documentElement.classList.replace(STATE.colorSchemeOptions.darkClass, scheme);
+         if (isHasLight) classList.replace(lightClass, scheme);
+         if (isHasDark) classList.replace(darkClass, scheme);
       }
-
-      darkMedia.onchange = changeClassScheme;
-      changeClassScheme(darkMedia);
    }
+
+   darkMedia.addEventListener('change', handler);
+   handler(darkMedia);
 }
 
 function clickResetScheme() {
@@ -230,13 +242,14 @@ function clickResetScheme() {
 function colorScheme(options) {
    if (options) setOptions(options);
 
+   const { selector = '[data-color-scheme]', resetSelector = '[data-scheme-reset]' } = STATE.colorSchemeOptions;
    /** @type {HTMLElement | null} */
-   const button = document.querySelector(STATE.colorSchemeOptions.selector);
+   const button = document.querySelector(selector);
    /** @type {HTMLElement | null} */
-   const resetButton = document.querySelector(STATE.colorSchemeOptions.resetSelector);
+   const resetButton = document.querySelector(resetSelector);
 
    if (!button) {
-      console.error(`Элемент по селектору ${STATE.colorSchemeOptions.selector} не найден!`);
+      console.error(`Элемент по селектору ${selector} не найден!`);
       cbInitial(autoColorScheme);
       return;
    }
@@ -247,49 +260,40 @@ function colorScheme(options) {
 }
 
 function colorSchemeLoad() {
-   const isCookiesStorage = STATE.colorSchemeOptions.storage === 'cookies';
-   let saveScheme;
+   const { mode, lightClass, darkClass, storage } = STATE.colorSchemeOptions;
+   const isCookiesStorage = storage === 'cookies';
+   const savedScheme = isCookiesStorage ? getCookie(STATE.storageTitle) : localStorage.getItem(STATE.storageTitle);
+   const root = document.documentElement;
 
-   if (isCookiesStorage) {
-      saveScheme = getCookie(STATE.storageTitle);
-   } else {
-      saveScheme = localStorage.getItem(STATE.storageTitle);
-   }
-
-   if (!saveScheme) {
-      autoColorScheme();
-   } else {
-      if (STATE.colorSchemeOptions.mode === 'attribute') {
-         document.documentElement.setAttribute('data-theme', saveScheme);
+   if (savedScheme) {
+      if (mode === 'attribute') {
+         root.setAttribute('data-theme', savedScheme);
       } else {
-         const isHasLight = document.documentElement.classList.contains(STATE.colorSchemeOptions.lightClass);
-         const isHasDark = document.documentElement.classList.contains(STATE.colorSchemeOptions.darkClass);
+         const classList = document.documentElement.classList;
+         const isHasLight = classList.contains(lightClass);
+         const isHasDark = classList.contains(darkClass);
 
          if (!isHasLight && !isHasDark) {
-            document.documentElement.classList.add(saveScheme);
+            classList.add(savedScheme);
          } else if (isHasLight && isHasDark) {
-            const extraScheme =
-               saveScheme === STATE.colorSchemeOptions.lightClass
-                  ? STATE.colorSchemeOptions.darkClass
-                  : STATE.colorSchemeOptions.lightClass;
-            document.documentElement.classList.remove(extraScheme);
+            const extraScheme = savedScheme === lightClass ? darkClass : lightClass;
+            classList.remove(extraScheme);
          } else {
-            if (isHasLight) document.documentElement.classList.replace(STATE.colorSchemeOptions.lightClass, saveScheme);
-            if (isHasDark) document.documentElement.classList.replace(STATE.colorSchemeOptions.darkClass, saveScheme);
+            if (isHasLight) classList.replace(lightClass, savedScheme);
+            if (isHasDark) classList.replace(darkClass, savedScheme);
          }
       }
+   } else {
+      autoColorScheme();
    }
 
    if (STATE.colorSchemeButton) {
-      if (STATE.colorSchemeOptions.mode === 'attribute') {
-         STATE.colorSchemeButton.onclick = clickChangeAttributeScheme;
-      } else {
-         STATE.colorSchemeButton.onclick = clickChangeClassScheme;
-      }
+      const handler = mode === 'attribute' ? clickChangeAttributeScheme : clickChangeClassScheme;
+      STATE.colorSchemeButton.addEventListener('click', handler);
    }
 
    if (STATE.resetSchemeButton) {
-      STATE.resetSchemeButton.onclick = clickResetScheme;
+      STATE.resetSchemeButton.addEventListener('click', clickResetScheme);
    }
 }
 
