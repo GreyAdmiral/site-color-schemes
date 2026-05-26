@@ -7,13 +7,13 @@
 #### CDN
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/site-color-schemes@2.0.0/dist/site-color-schemes.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/site-color-schemes@2.1.0/dist/site-color-schemes.min.js"></script>
 ```
 
 or
 
 ```html
-<script src="https://unpkg.com/site-color-schemes@2.0.0/dist/site-color-schemes.min.js"></script>
+<script src="https://unpkg.com/site-color-schemes@2.1.0/dist/site-color-schemes.min.js"></script>
 ```
 
 #### Import
@@ -89,7 +89,7 @@ Select a storage for the colors cheme state. You can choose from localStorage or
 #### CDN
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/site-color-schemes@2.0.0/dist/site-color-schemes.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/site-color-schemes@2.1.0/dist/site-color-schemes.min.js"></script>
 
 ...
 
@@ -101,7 +101,7 @@ Select a storage for the colors cheme state. You can choose from localStorage or
 or
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/site-color-schemes@2.0.0/dist/site-color-schemes.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/site-color-schemes@2.1.0/dist/site-color-schemes.min.js"></script>
 
 ...
 

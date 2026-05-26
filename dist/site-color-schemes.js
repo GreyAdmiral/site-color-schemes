@@ -7,15 +7,15 @@
  * @prop {string} lightClass
  * @prop {string} darkClass
  * @prop {'class' | 'attribute'} mode
- * @prop {'local' | 'cookies'} storage
+ * @prop {'localStorage' | 'cookies'} storage
  */
 
 /**
  * @typedef {object} STATE
+ * @prop {string} storageTitle='userScheme'
  * @prop {defaultOptions} colorSchemeOptions
  * @prop {HTMLElement | null} [colorSchemeButton]
  * @prop {HTMLElement | null} [resetSchemeButton]
- * @prop {string} storageTitle
  */
 
 /** @type {defaultOptions} */
@@ -24,7 +24,7 @@ const DEFAULT_OPTIONS = {
    resetSelector: '[data-scheme-reset]',
    lightClass: 'light',
    darkClass: 'dark',
-   storage: 'local',
+   storage: 'localStorage',
    mode: 'class',
 };
 
@@ -179,14 +179,26 @@ function autoColorScheme(options) {
    if (options) setOptions(options);
 
    const darkMedia = window.matchMedia('(prefers-color-scheme: dark)');
-   let scheme = darkMedia.matches ? STATE.colorSchemeOptions.darkClass : STATE.colorSchemeOptions.lightClass;
+   const scheme = darkMedia.matches ? STATE.colorSchemeOptions.darkClass : STATE.colorSchemeOptions.lightClass;
 
    if (STATE.colorSchemeOptions.mode === 'attribute') {
       document.documentElement.setAttribute('data-theme', scheme);
       darkMedia.onchange = changeAttributeScheme;
       changeAttributeScheme(darkMedia);
    } else {
-      document.documentElement.classList.add(scheme);
+      const isHasLight = document.documentElement.classList.contains(STATE.colorSchemeOptions.lightClass);
+      const isHasDark = document.documentElement.classList.contains(STATE.colorSchemeOptions.darkClass);
+
+      if (!isHasLight && !isHasDark) {
+         document.documentElement.classList.add(scheme);
+      } else if (isHasLight && isHasDark) {
+         const extraScheme = darkMedia.matches ? STATE.colorSchemeOptions.lightClass : STATE.colorSchemeOptions.darkClass;
+         document.documentElement.classList.remove(extraScheme);
+      } else {
+         if (isHasLight) document.documentElement.classList.replace(STATE.colorSchemeOptions.lightClass, scheme);
+         if (isHasDark) document.documentElement.classList.replace(STATE.colorSchemeOptions.darkClass, scheme);
+      }
+
       darkMedia.onchange = changeClassScheme;
       changeClassScheme(darkMedia);
    }
@@ -213,7 +225,7 @@ function clickResetScheme() {
  * @param {string} [options.lightClass]
  * @param {string} [options.darkClass]
  * @param {'class' | 'attribute'} [options.mode]
- * @param {'local' | 'cookies'} [options.storage]
+ * @param {'localStorage' | 'cookies'} [options.storage]
  */
 function colorScheme(options) {
    if (options) setOptions(options);
@@ -250,7 +262,21 @@ function colorSchemeLoad() {
       if (STATE.colorSchemeOptions.mode === 'attribute') {
          document.documentElement.setAttribute('data-theme', saveScheme);
       } else {
-         document.documentElement.classList.add(saveScheme);
+         const isHasLight = document.documentElement.classList.contains(STATE.colorSchemeOptions.lightClass);
+         const isHasDark = document.documentElement.classList.contains(STATE.colorSchemeOptions.darkClass);
+
+         if (!isHasLight && !isHasDark) {
+            document.documentElement.classList.add(saveScheme);
+         } else if (isHasLight && isHasDark) {
+            const extraScheme =
+               saveScheme === STATE.colorSchemeOptions.lightClass
+                  ? STATE.colorSchemeOptions.darkClass
+                  : STATE.colorSchemeOptions.lightClass;
+            document.documentElement.classList.remove(extraScheme);
+         } else {
+            if (isHasLight) document.documentElement.classList.replace(STATE.colorSchemeOptions.lightClass, saveScheme);
+            if (isHasDark) document.documentElement.classList.replace(STATE.colorSchemeOptions.darkClass, saveScheme);
+         }
       }
    }
 

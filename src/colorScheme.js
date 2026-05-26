@@ -49,7 +49,21 @@ function colorSchemeLoad() {
       if (STATE.colorSchemeOptions.mode === 'attribute') {
          document.documentElement.setAttribute('data-theme', saveScheme);
       } else {
-         document.documentElement.classList.add(saveScheme);
+         const isHasLight = document.documentElement.classList.contains(STATE.colorSchemeOptions.lightClass);
+         const isHasDark = document.documentElement.classList.contains(STATE.colorSchemeOptions.darkClass);
+
+         if (!isHasLight && !isHasDark) {
+            document.documentElement.classList.add(saveScheme);
+         } else if (isHasLight && isHasDark) {
+            const extraScheme =
+               saveScheme === STATE.colorSchemeOptions.lightClass
+                  ? STATE.colorSchemeOptions.darkClass
+                  : STATE.colorSchemeOptions.lightClass;
+            document.documentElement.classList.remove(extraScheme);
+         } else {
+            if (isHasLight) document.documentElement.classList.replace(STATE.colorSchemeOptions.lightClass, saveScheme);
+            if (isHasDark) document.documentElement.classList.replace(STATE.colorSchemeOptions.darkClass, saveScheme);
+         }
       }
    }
 
