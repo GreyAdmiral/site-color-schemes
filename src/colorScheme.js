@@ -12,7 +12,7 @@ import { clickResetScheme } from './resetScheme.js';
  * @param {string} [options.lightClass]
  * @param {string} [options.darkClass]
  * @param {'class' | 'attribute'} [options.mode]
- * @param {'local' | 'cookies'} [options.storage]
+ * @param {'localStorage' | 'cookies'} [options.storage]
  */
 export default function colorScheme(options) {
    if (options) setOptions(options);

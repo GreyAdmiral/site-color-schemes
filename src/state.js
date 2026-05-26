@@ -7,15 +7,15 @@
  * @prop {string} lightClass
  * @prop {string} darkClass
  * @prop {'class' | 'attribute'} mode
- * @prop {'local' | 'cookies'} storage
+ * @prop {'localStorage' | 'cookies'} storage
  */
 
 /**
  * @typedef {object} STATE
+ * @prop {string} storageTitle='userScheme'
  * @prop {defaultOptions} colorSchemeOptions
  * @prop {HTMLElement | null} [colorSchemeButton]
  * @prop {HTMLElement | null} [resetSchemeButton]
- * @prop {string} storageTitle
  */
 
 /** @type {defaultOptions} */
@@ -24,17 +24,17 @@ const DEFAULT_OPTIONS = {
    resetSelector: '[data-scheme-reset]',
    lightClass: 'light',
    darkClass: 'dark',
-   storage: 'local',
+   storage: 'localStorage',
    mode: 'class',
 };
 
 /** @type {STATE} */
-export const STATE = {
+export const STATE = Object.seal({
    colorSchemeOptions: { ...DEFAULT_OPTIONS },
    storageTitle: 'userScheme',
    colorSchemeButton: null,
    resetSchemeButton: null,
-};
+});
 
 /**
  * @param {Partial<defaultOptions>} [options]

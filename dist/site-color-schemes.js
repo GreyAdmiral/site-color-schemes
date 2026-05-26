@@ -29,12 +29,12 @@ const DEFAULT_OPTIONS = {
 };
 
 /** @type {STATE} */
-const STATE = {
+const STATE = Object.seal({
    colorSchemeOptions: { ...DEFAULT_OPTIONS },
    storageTitle: 'userScheme',
    colorSchemeButton: null,
    resetSchemeButton: null,
-};
+});
 
 /**
  * @param {Partial<defaultOptions>} [options]
