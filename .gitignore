@@ -16,6 +16,7 @@ version.json
 *.komodoproject
 .vscode/*
 !.vscode/extensions.json
+.gigacode
 
 # Игнорировать файлы карт
 *.css.map

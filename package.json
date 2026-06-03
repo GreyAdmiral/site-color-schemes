@@ -1,11 +1,14 @@
 {
    "name": "site-color-schemes",
    "description": "Plugin of determining and switching the color theme of the site",
-   "version": "2.1.0",
-   "homepage": "https://github.com/GreyAdmiral",
+   "version": "2.1.1",
+   "homepage": "https://github.com/GreyAdmiral/site-color-schemes",
    "repository": "git://github.com/GreyAdmiral/site-color-schemes.git",
    "author": "Binarion (https://greyadmiral.github.io/)",
    "main": "dist/index.js",
+   "files": [
+      "dist"
+   ],
    "keywords": [
       "plugin",
       "color-schemes",
@@ -13,7 +16,7 @@
    ],
    "license": "MIT",
    "scripts": {
-      "build": "rollup -c"
+      "build": "rm -rf dist && rollup -c"
    },
    "devDependencies": {
       "@babel/preset-env": "^7.29.5",
